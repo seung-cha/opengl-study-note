@@ -1,7 +1,5 @@
 # OpenGL starter code & Study Note
 Starter code for OpenGL (including the required libraries) and study note for personal use.  
-
-  
 This study note is not very extensive since I'm not a big fan of making neat notes - I prefer to understand and memorise them.  
 
 It is intended to read the [tutorial](https://learnopengl.com) over and over until I internalise it.
@@ -18,19 +16,23 @@ It is intended to read the [tutorial](https://learnopengl.com) over and over unt
 
 
 # Getting Started
-Download [GLFW](#https://www.glfw.org) and [GLAD](https://glad.dav1d.de). For GLAD, set Profile to Core, gl to version 3.3 and click generate. Watch this [youtube tutorial](https://youtu.be/XpBGwZNyUh0?si=rgaipn1xYPWQxw4p) for the rest of the step.
+Download [GLFW](#https://www.glfw.org) and [GLAD](https://glad.dav1d.de). For GLAD, set Profile to Core, gl to version 3.3 and click generate. Watch this [youtube tutorial](https://youtu.be/XpBGwZNyUh0?si=rgaipn1xYPWQxw4p) for the rest of the step.  
+
+Other libraries are not included as they are not needed to run OpenGL. But you can download them here as well. [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h)
 
 # Theory
 To be added
 
 
 # OpenGL
-
-[Creating a new window](#creating-a-new-window)  
-[Loading GLAD](#loading-glad)  
-[Window Loop](#window-loop)  
-[Buffers](#buffers)
-[Shaders](#shaders)
+### Table of Contents
+* [Creating a new window](#creating-a-new-window)  
+* [Loading GLAD](#loading-glad)  
+* [Window Loop](#window-loop)  
+* [Buffers](#buffers)  
+* [Shaders](#shaders)  
+* [Textures](#textures)  
+* [GLSL](#glsl)
 
 ## Creating a New Window
 Include the libraries for GLAD and GLFW. glad should be included prior to GLFW.  
@@ -154,3 +156,91 @@ glBindVertexArray(VAO);
 
 //Do the drawing calls here
 ```
+
+## Textures
+Textures have their own coordinate system where bottom left is `(0,0)` and top right is `(1,0)`. The horizontal axis is `S`, vertical `T` and depth (if 3D texture) `R`.  
+![Texture Coordinates](https://learnopengl.com/img/getting-started/tex_coords.png)
+  
+It is possible to define coordinates larger/smaller than `(1,1)`. If larger than 1, the image will repeat. If smaller, only a subset of the texture will be used.  
+![UV mapping](./readme_images/uvMap.png)
+
+  
+The behaviour for when coordinates are greater than 1 can be set using `glTexParameteri` or `glTexParameterfv`.
+![TexParameters](./readme_images/texture_wrapping.png)  
+```cpp
+glTexParameteri(GL_TEXTURE_nD, GL_TEXTURE_WRAP_#, GL_OPTION);
+```
+Note that for `GL_CLAMP_TO_BORDER`, you would use `glTexParameterfv` instead, specifying the colour of the border.
+```cpp
+glTexParameteri(GL_TEXTURE_nD, GL_TEXTURE_WRAP_#, GL_CLAMP_TO_BORDER);
+
+//Specify the colours
+float borderColour[] = {r,g,b,a};
+glTexParameterfv(GL_TEXTURE_nD, GL_TEXTURE_BORDER_COLOR, borderColour);
+```
+
+Similarly, you can choose filtering mode for when texture is zoomed in/out.
+![Texture Filtering](./readme_images/texture_filtering.png)  
+`GL_NEAREST` chooses the closest pixel whereas `GL_LINEAR` chooses the pixel average of neighbouring ones.
+```cpp
+glTexParameteri(GL_TEXTURE_nD, GL_TEXTURE_MIN/MAX_FILTER, GL_FILERING_OPTION);
+```
+Mipmap is an image map where subsequent texture is half the size of the previous one. This is used to apply texture on objects that are far.
+![MipMap](./readme_images/mipmap.png)
+```cpp
+//Generate a mipmap for texture bound to nD.
+glGenerateMipmap(GL_TEXTURE_nD);
+```
+Similar to the filtering option, the same filtering options can be chosen for mipmap.
+```cpp
+glTexParameteri(GL_TEXTURE_nD, GL_TEXTURE_MIN_FILTER, GL_OPTION);
+```
+where `GL_OPTION` can be one of the following:  
+* `GL_NEAREST_MIPMAP_NEAREST`: Choose the nearest mipmap (`MIPMAP_NEAREST`) and select pixel using the nearest filtering (`GL_NEAREST`)
+* `GL_LINEAR_MIPMAP_NEAREST`: Choose the nearest mipmap (`MIPMAP_NEAREST`) and select pixel using the linear interpolation (`GL_LINEAR`)
+* `GL_NEAREST_MIPMAP_LINEAR`: Choose the mipmap via linear interpolation (`MIPMAP_LINEAR`) and select pixel using the nearest filtering (`GL_NEAREST`)
+* `GL_LINEAR_MIPMAP_LINEAR`: Choose the mipmap via linear interpolation (`MIPMAP_LINEAR`) and select pixel using the linear interpolation filtering (`GL_LINEAR`)
+
+
+All of the options above only apply for the currently bound texture. So a texture must be bound via `GL_BIND_TEXTURE`.
+
+```cpp
+GLuint texture;
+
+//Generate a texture
+glGenTexture(GL_TEXTURE_nD, &texture);
+//Bind texture data
+glBindTexture(GL_TEXTURE_nD, texture);
+//Bind data
+glTexImagenD(GL_TEXTURE_nD, 0, GL_RGB, width, height, 0, GL_RGB, textureData);
+//Generate mipmap
+glGenerateMipmap(GL_TEXTURE_nD);
+
+//Do some filtering/repetition options.
+//All of them will be applied to the texture data above.
+```
+
+`glTexImagenD` has lots of arguments. For `glTexImage2D`, the parameters are as follows:
+```cpp
+void glTexImage2D(
+        GLenum target,
+        GLint level,
+        GLint internalFormat,
+        GLsizei width,
+        GLsizei height,
+        GLint border,
+        GLenum format,
+        GLenum type,
+        const GLvoid* data
+    );
+```
+where  
+* `target`: Specify the target this data will be stored in. Typically it's `GL_TEXTURE_2D` since `glTexImage2D` creates a 2D texture.
+* `'level'`: Level of detail number. Typically set to 0.
+* `internalFormat`: Format for OpenGL to use. 
+* `border`: Must be set to 0 (Literally that's how the official document states)
+* `format`: Format of the image data
+* `data`: Actual image data  
+
+## GLSL
+To be added
