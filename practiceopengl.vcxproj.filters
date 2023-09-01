@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\vertexShader">
+      <UniqueIdentifier>{f9cb9858-eb0c-45ca-b1f6-abbfaa4c8a0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\fragmentShader">
+      <UniqueIdentifier>{bdc9fa7c-2759-4619-9c82-27d569ec2902}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -21,5 +27,21 @@
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileIncluder.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vertexShader\vertexShader.glsl">
+      <Filter>Resource Files\vertexShader</Filter>
+    </None>
+    <None Include="fragmentShader\fragmentShader.glsl">
+      <Filter>Resource Files\fragmentShader</Filter>
+    </None>
   </ItemGroup>
 </Project>

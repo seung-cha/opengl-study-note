@@ -18,7 +18,7 @@ It is intended to read the [tutorial](https://learnopengl.com) over and over unt
 # Getting Started
 Download [GLFW](#https://www.glfw.org) and [GLAD](https://glad.dav1d.de). For GLAD, set Profile to Core, gl to version 3.3 and click generate. Watch this [youtube tutorial](https://youtu.be/XpBGwZNyUh0?si=rgaipn1xYPWQxw4p) for the rest of the step.  
 
-Other libraries are not included as they are not needed to run OpenGL. But you can download them here as well. [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h)
+Other libraries are not included as they are not needed to run OpenGL. But you can download them here as well. [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h), [GLM](https://glm.g-truc.net/0.9.8/index.html)
 
 # Theory
 To be added
@@ -94,7 +94,22 @@ This buffer is where the indices of vertices are stored. This buffer is optional
   
 When this is used, drawing can be done by specifying the order of drawing, saving resources consequently.  
   
-Element Buffer is also known as `Element Buffer Object` or `EBO`. In GLAD, it is called `GL_ELEMENT_ARRAY_BUFFER`
+Element Buffer is also known as `Element Buffer Object` or `EBO`. In GLAD, it is called `GL_ELEMENT_ARRAY_BUFFER`  
+  
+Drawing can be done using `glDrawElements`  
+```cpp
+void glDrawElements(
+        GLenum mode,
+        GLsizei count,
+        GLenum type,
+        const void* indices
+    );
+```
+Where  
+* `mode`: Specifies the drawing mode
+* `count`: Number of elements to use to draw
+* `type`: Data type of the indices, must be `GL_UNSIGNED_BYTE`, `GL_UNSIGNED_SHORT` or `GL_UNSIGNED_INT`.
+* `indices`: Pointer to the stored indices.
 
 ---
 ### Vertex Array Buffer
@@ -118,6 +133,15 @@ This buffer needs to be bound when drawing. Others can be unbound at this time.
 
     //Do the drawing calls here.
 ```
+Drawing can be done using `glDrawArrays` 
+```cpp
+void glDrawArrays(GLenum mode, GLint first, GLsizei count);
+``` 
+where  
+* `mode`: Specify the drawing mode
+* `first`: Specify the first index of enabled array
+* `count`: Number of indices to draw
+
 Vertex Array Buffer is also known as `Vertex Array Object` or `VAO`. In GLAD, functions for this buffer are specified with `VertexArray`  
   
 Linking between `VAO` and `VBO` occurs when calling

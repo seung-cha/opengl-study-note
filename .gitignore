@@ -429,3 +429,10 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Specifically ignore optional libraries + shader sources and textures
+stb_image.h
+vertexShader/
+fragmentShader/
+textures/
+glm

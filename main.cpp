@@ -2,178 +2,184 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}";
+#include "FileIncluder.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"	FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);\n"
-"}";
+
 
 
 
 void windowFramebufferChangeCallback(GLFWwindow*, int, int);
 
+using namespace std;
 
 int main()
 {
+	/*
+	float vertices[] = {
+	-0.5f, -0.5f, 0.0f,
+	 0.5f, -0.5f, 0.0f,
+	 0.0f,  0.5f, 0.0f
+	};
+	*/
+	float vertices[] = {
+	 0.5f,  0.5f, 0.0f,  // top right
+	 0.5f, -0.5f, 0.0f,  // bottom right
+	-0.5f, -0.5f, 0.0f,  // bottom left
+	-0.5f,  0.5f, 0.0f   // top left 
+	};
+	unsigned int indices[] = {  // note that we start from 0!
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
+	};
 
-	//Initialise glfw
+
+//---------------------------------------Init---------------------------------------------------------------
+	// Initialise GLFW 
 	glfwInit();
 
-	//Set glfw version to 3.3 as well as core profile
+	// Set up GLFW, feed in version info
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-
-	GLfloat vertices[] =
-	{
-		-0.5f, -0.5f, 0,
-		0.5f, -0.5f, 0,
-		0.0f, 0.5f, 0,
-	};
-
-
-	//Create a new glfw window which does nothing on its own.
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Hi", NULL, NULL);
-
-	if (!window)
-	{
-		std::cout << "Something went wrong!" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-
-	//Make all glfw calls direct to this window
+	//Create and bind window
+	GLFWwindow* window = glfwCreateWindow(800, 600, "Hallo Ward!", NULL, NULL);
 	glfwMakeContextCurrent(window);
 
+	//Set window resize callback
 	glfwSetFramebufferSizeCallback(window, windowFramebufferChangeCallback);
 
+	//Initialise GLAD
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-	
-	//Initialse glad to use GL functions this must be done after a window is made current.
-	gladLoadGL();
-
-	//Set up rendering viewport
+	//Set viewport
 	glViewport(0, 0, 800, 600);
 
-	//Create a vertex shader
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+//----------------------------------------------------------------------------------------------------------
+//------------------------------------Shaders---------------------------------------------------------------
+	//Import and create shaders
+	const char* vertexShaderSource = Helper::ImportFile("vertexShader/vertexShader.glsl");
+	const char* fragmentShaderSource = Helper::ImportFile("fragmentShader/fragmentShader.glsl");
 
-	// GLUint source, GLSizei count, GLchar** string,  GLint* length
-	// Register 'counter' number of registers to 'source' vertex shader
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	GLuint vertexShaderID, fragmentShaderID;
 
-	//Compile the shader
-	glCompileShader(vertexShader);
-
-
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-
-	//Create a shader program that takes vertex shader and fragment shader.
-	GLuint shaderProgram = glCreateProgram();
-
-	//Attach vertex/fragement shader to this object
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-
-	//Link the two. From now on, shader sources can be deleted.
-	glLinkProgram(shaderProgram);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-
-
+	//Create shader IDs, source and then compile them
+	vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	
-	//Vertex buffer to contain vertex data.
-	GLuint VBO;
+	glShaderSource(vertexShaderID, 1, &vertexShaderSource, NULL);
+	glShaderSource(fragmentShaderID, 1, &fragmentShaderSource, NULL);
 
-	//Vertex array to govern the usage of vertex data.
-	GLuint VAO;
+	glCompileShader(vertexShaderID);
+	glCompileShader(fragmentShaderID);
+
+	//Create a central shader program and bind the shaders.
+	GLuint shaderProgramID;
+	shaderProgramID = glCreateProgram();
+
+	glAttachShader(shaderProgramID, vertexShaderID);
+	glAttachShader(shaderProgramID, fragmentShaderID);
+
+	//From this point, the shaders can be free'd.
+	glLinkProgram(shaderProgramID);
+	
+	//Free the shaders, including the source
+	glDeleteShader(vertexShaderID);
+	glDeleteShader(fragmentShaderID);
+
+	free((void*)vertexShaderSource);
+	free((void*)fragmentShaderSource);
+
+//----------------------------------------------------------------------------------------------------------
+//------------------------------------Buffers---------------------------------------------------------------
+
+	//Create VAO
+	GLuint vertexArrayBufferID;
+	glGenVertexArrays(1, &vertexArrayBufferID);
+	//Bind VAO, indicating any other buffers will be associated to this.
+	glBindVertexArray(vertexArrayBufferID);
 
 
-	//Create a vertex array and bind it
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	//Create VBO
+	GLuint vertexBufferID;
+	glGenBuffers(1, &vertexBufferID);
 
-
-	//Create a vertex buffer and bind it
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	//Bind data to the array buffer
+	//Bind & Generate data
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	//Specify the data and location
-	//This modifies the currently-bound vertex buffer
+	//Assign buffer usage & open location
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-
-	//Enable the array, location specified by the argument
 	glEnableVertexAttribArray(0);
 
-	//Unbind the two buffers
+	//Create EBO
+	GLuint elementBufferID;
+	glGenBuffers(1, &elementBufferID);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+
+	//Unbind VBO/VAO/EBO
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	
 
 
 
-	//Write color to back buffer then apply it
-
-	//Swap the front buffer to the back buffer
+//----------------------------------------------------------------------------------------------------------
+//----------------------------------Rendering---------------------------------------------------------------
 
 	while (!glfwWindowShouldClose(window))
 	{
-
-		//Wipe out the back buffer with specified colour
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-		//Apply the colour
+		glClearColor(0.13f, 0.13f, 0.13f, 1.0f); 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//Use specified shader program to render image
-		glUseProgram(shaderProgram);
-		//Bind a vertex array to receive data from
-		glBindVertexArray(VAO);
+		//Enable shader & vertex array
+		glUseProgram(shaderProgramID);
+		glBindVertexArray(vertexArrayBufferID);
 
-		//Draw
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//Draw using VBO
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		//Draw using EBO
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferID);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		//Unbind shader & vertex array
+		glUseProgram(0);
+		glBindVertexArray(0);
 
 
-
-		//Swap the double buffers
+		//Process miscellaneous things
 		glfwSwapBuffers(window);
-		//Process inputs etc
 		glfwPollEvents();
-
 	}
 
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteProgram(shaderProgram);
+	
 
 
-	glfwDestroyWindow(window);
+
 	glfwTerminate();
-	return 0;
+
+
 
 }
 
 
 void windowFramebufferChangeCallback(GLFWwindow* window, int width, int height)
 {
-	//glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(window);
 	glViewport(0, 0, width, height);
 
 }
