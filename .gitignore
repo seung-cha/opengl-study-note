@@ -437,6 +437,3 @@ fragmentShader/
 textures/
 glm
 
-
-# Ignore main since I'm actively working on it but I don't want to commit.
-main.cpp

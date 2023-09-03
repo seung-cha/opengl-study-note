@@ -71,7 +71,7 @@ This section is equivalent to lectures 1 ~ 4 and a bit of 5, too. Also a bit of 
 ### Matrix Interpretation
 Professor Gilbert Strang (Lecturer of MIT 18.04) provides us with a new perspective to interpret matrix multiplication. What I find the most helpful is the `row interpretation` - You are multiplying one row at a time, as opposed to multiplying matrices (or matrix * vertex) one entry at a time.  
 
-$\small \begin{bmatrix}1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}\times \begin{bmatrix} a \\ b \\ c \end{bmatrix} $ 
+$\small \begin{bmatrix}1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}\times \begin{bmatrix} a \\ b \\ c \end{bmatrix}$ 
 is interpreted as 
 $\small \begin{bmatrix}R_1 \\ R_2 \\ R_3\end{bmatrix} \times \begin{bmatrix} a \\ b \\ c \end{bmatrix} = \begin{bmatrix} R_1 \cdot (a, b, c) \\ R_2 \cdot (a, b, c) \\ R_3 \cdot (a, b, c) \\  \end{bmatrix}$. This is the **row way** to interpret matrix multiplication.   
 
@@ -323,11 +323,11 @@ Textures have their own coordinate system where bottom left is `(0,0)` and top r
 ![Texture Coordinates](https://learnopengl.com/img/getting-started/tex_coords.png)
   
 It is possible to define coordinates larger/smaller than `(1,1)`. If larger than 1, the image will repeat. If smaller, only a subset of the texture will be used.  
-![UV mapping](./readme_images/uvMap.png)
+![UV mapping](readme_images/uvMap.png)
 
   
 The behaviour for when coordinates are greater than 1 can be set using `glTexParameteri` or `glTexParameterfv`.
-![TexParameters](./readme_images/texture_wrapping.png)  
+![TexParameters](readme_images/texture_wrapping.png)  
 ```cpp
 glTexParameteri(GL_TEXTURE_nD, GL_TEXTURE_WRAP_#, GL_OPTION);
 ```
@@ -341,13 +341,13 @@ glTexParameterfv(GL_TEXTURE_nD, GL_TEXTURE_BORDER_COLOR, borderColour);
 ```
 
 Similarly, you can choose filtering mode for when texture is zoomed in/out.
-![Texture Filtering](./readme_images/texture_filtering.png)  
+![Texture Filtering](readme_images/texture_filtering.png)  
 `GL_NEAREST` chooses the closest pixel whereas `GL_LINEAR` chooses the pixel average of neighbouring ones.
 ```cpp
 glTexParameteri(GL_TEXTURE_nD, GL_TEXTURE_MIN/MAG_FILTER, GL_FILERING_OPTION);
 ```
 Mipmap is an image map where subsequent texture is half the size of the previous one. This is used to apply texture on objects that are far.
-![MipMap](./readme_images/mipmap.png)
+![MipMap](readme_images/mipmap.png)
 ```cpp
 //Generate a mipmap for texture bound to nD.
 glGenerateMipmap(GL_TEXTURE_nD);
