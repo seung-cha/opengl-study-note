@@ -71,15 +71,15 @@ This section is equivalent to lectures 1 ~ 4 and a bit of 5, too. Also a bit of 
 ### Matrix Interpretation
 Professor Gilbert Strang (Lecturer of MIT 18.04) provides us with a new perspective to interpret matrix multiplication. What I find the most helpful is the `row interpretation` - You are multiplying one row at a time, as opposed to multiplying matrices (or matrix * vertex) one entry at a time.  
 
-$`\small \begin{bmatrix}1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}\times \begin{bmatrix} a \\ b \\ c \end{bmatrix} `$ 
+$`  \begin{bmatrix}1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}\times \begin{bmatrix} a \\ b \\ c \end{bmatrix} `$ 
 is interpreted as 
-$`\small \begin{bmatrix}R_1 \\ R_2 \\ R_3\end{bmatrix} \times \begin{bmatrix} a \\ b \\ c \end{bmatrix} = \begin{bmatrix} R_1 \cdot (a, b, c) \\ R_2 \cdot (a, b, c) \\ R_3 \cdot (a, b, c) \\  \end{bmatrix} `$. This is the **row way** to interpret matrix multiplication.   
+$`  \begin{bmatrix}R_1 \\ R_2 \\ R_3\end{bmatrix} \times \begin{bmatrix} a \\ b \\ c \end{bmatrix} = \begin{bmatrix} R_1 \cdot (a, b, c) \\ R_2 \cdot (a, b, c) \\ R_3 \cdot (a, b, c) \\  \end{bmatrix} `$. This is the **row way** to interpret matrix multiplication.   
 
-First row is $\small \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}$. Dot product of this with $\small \begin{bmatrix} a & b & c \end{bmatrix}$ gives you the first row of matrix * vector.  
+First row is $`  \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}`$. Dot product of this with $`  \begin{bmatrix} a & b & c \end{bmatrix}`$ gives you the first row of matrix * vector.  
 This is really just saying " I want `1 of a`, `2 of b` and `3 of c` summed all together for my first row".  
 
 With this concept firmly grapsed in your mind, it's easy to verify & perform matrix multiplication of any size.  
-$`\small \begin{bmatrix} 2 & 7 & 4 \\ 1 & 3 & 2 \\ 8 & 0 & 2 \end{bmatrix} \times \begin{bmatrix} 3 & 1 & 1 \\ 9 & 6 & 5 \\ 2 & 3 &8 \end{bmatrix} = \begin{bmatrix} 77 & 56 & 69 \\ 34 & 25 & 32 \\ 28 & 14 & 24 \end{bmatrix} `$  
+$`  \begin{bmatrix} 2 & 7 & 4 \\ 1 & 3 & 2 \\ 8 & 0 & 2 \end{bmatrix} \times \begin{bmatrix} 3 & 1 & 1 \\ 9 & 6 & 5 \\ 2 & 3 &8 \end{bmatrix} = \begin{bmatrix} 77 & 56 & 69 \\ 34 & 25 & 32 \\ 28 & 14 & 24 \end{bmatrix} `$  
   
 >For the first row, I want `2 of the first row`, `7 of the second row` and `4 of the third row` summed all together!.  
 
@@ -88,26 +88,26 @@ There are more ways to interpret matrix multiplication. These are not included s
 ---
 #### Matrix Multiplication Verification via Row Interpretation
 In a similar way you can verify and reason the dimensions of resulting matrix.  
-$`\small \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix} \times \begin{bmatrix} 5 & 5 \\ 6 & 6 \end{bmatrix} `$  
+$`  \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix} \times \begin{bmatrix} 5 & 5 \\ 6 & 6 \end{bmatrix} `$  
 
 > I want `1 of the first row`, `2 of the second row` and `3 of the third row (???)` summed all together for my first entry
 
 This does not make sense at all as the second matrix only has 2 rows. This matrices multiplication is not valid.  
 Note that It's not possible to verify every matrix by row interpretation. You will also need to use `column interpretation` to verify all matrices (Watch the lectures!!!!)  
 
-$`\small \begin{bmatrix} 1 & 2  \\ 4 & 5  \\ 7 & 8  \end{bmatrix} \times \begin{bmatrix} 5 & 5 & 5\\ 6 & 6 & 6 \\ 7 & 7 & 7 \end{bmatrix} `$  
+$`  \begin{bmatrix} 1 & 2  \\ 4 & 5  \\ 7 & 8  \end{bmatrix} \times \begin{bmatrix} 5 & 5 & 5\\ 6 & 6 & 6 \\ 7 & 7 & 7 \end{bmatrix} `$  
 
 > I want `1 of the first row`, `2 of the second row` summed together for my first entry
 
 This statement makes sense although matrix multiplication of `[3, 2]` with `[3, 3]` is not possible. By definition, in order to multiply `matrix A` by `matrix B`, `A` must have the same number of columns as the rows of `B`. The resulting dimensions are `[n, p]` where `n = no. rows in A`, `p = no. cols in B`.  
 
-$`\small A = (n\ by\ m)\ and\ B = (m\ by\ p)\ then\ AB = (n\ by\ p) `$
+$`  A = (n\ by\ m)\ and\ B = (m\ by\ p)\ then\ AB = (n\ by\ p) `$
 
 ---
 #### Figuring Out Dimensions of AB via Row Interpretation
 Row interpretation allows us to subconsciously figure out the resulting dimensions of A*B.
 
-$`\small \begin{bmatrix} 1 & 2 \\ 3 & 4\end{bmatrix} \times \begin{bmatrix} 9 & 9 & 9 \\ 8 & 8 & 8 \end{bmatrix} = \begin{bmatrix} 25 & 25 & 25 \\ 59 & 59 & 59 \end{bmatrix} `$
+$`  \begin{bmatrix} 1 & 2 \\ 3 & 4\end{bmatrix} \times \begin{bmatrix} 9 & 9 & 9 \\ 8 & 8 & 8 \end{bmatrix} = \begin{bmatrix} 25 & 25 & 25 \\ 59 & 59 & 59 \end{bmatrix} `$
 
 > I want `1 of the first row` + `2 of the second row` for the first row of AB and `3 of the first row` + `4 of the second row` for the second row of AB. The dimensions of AB must be 2 rows and 3 columns since we want 2 rows and each row of B contains 3 elements.
 
@@ -115,7 +115,7 @@ $`\small \begin{bmatrix} 1 & 2 \\ 3 & 4\end{bmatrix} \times \begin{bmatrix} 9 & 
 #### Permutation Matrices
 We know that Identity Matrix $I$ is an n by n matrix whose diagonals are 1 and everything else 0. Permutation matrices, on the other hand, have similar appearance yet they act differently on matrices. We reason how they act via `row interpretation`.  
 
-$`\small P= \begin{bmatrix}1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0\end{bmatrix} \times B=\begin{bmatrix} R_1 \\ R_2 \\ R_3\end{bmatrix}\ Here,\ R_n\ represents\ the\ nth\ row\ which\ has\ 3\ elements. `$  
+$`  P= \begin{bmatrix}1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0\end{bmatrix} \times B=\begin{bmatrix} R_1 \\ R_2 \\ R_3\end{bmatrix}\ Here,\ R_n\ represents\ the\ nth\ row\ which\ has\ 3\ elements. `$  
 We reason how this multiplication will turn out.
 
 > For the first row, I want the first row of B and nothing else.  
@@ -123,7 +123,7 @@ We reason how this multiplication will turn out.
 > For the last row, I want the second row of B and nothing else.
 
 After our reasoning, it turns out the resulting matrix PB is going to be 
-$`\small \begin{bmatrix} R_1 \\ R_3 \\ R_2 \end{bmatrix} `$, second and third rows swapped. Indeed, permutation matrices are just matrices which want just one specific row of B and nothing else for each entry.  
+$`  \begin{bmatrix} R_1 \\ R_3 \\ R_2 \end{bmatrix} `$, second and third rows swapped. Indeed, permutation matrices are just matrices which want just one specific row of B and nothing else for each entry.  
   
 Note that matrix multiplication is not commutative (AB != BA). So PB is not the same as BP. P on the right side will swap columns of B instead.  
 
@@ -132,14 +132,14 @@ Note that matrix multiplication is not commutative (AB != BA). So PB is not the 
 In OpenGL, matrix multiplications are reversed. If your code translates first then scales, the output will be scale applied first then translation. We reason this using the properties of matrix multiplication.  
 
 Suppose we have the following Equations  
-$`\small M_{t} \cdot M_{s} \cdot x `$.  
+$`  M_{t} \cdot M_{s} \cdot x `$.  
 
 Here, $M_t$ is a translation matrix, $`M_s`$ scale matrix and $`x`$ the vector a a vertex.  
 Using the associative law (A + B) + C = A + (B + C), we can reason that scale matrix will act on the vector first.  
  
-$`\small M_{t} \cdot (M_{s} \cdot x) = M_{t} \cdot x_{scaled} `$.  
+$`  M_{t} \cdot (M_{s} \cdot x) = M_{t} \cdot x_{scaled} `$.  
 And then the translation matrix acts on the vector.  
-$`\small M_{t} \cdot x_{scaled} = x_{scaledTranslated} `$  
+$`  M_{t} \cdot x_{scaled} = x_{scaledTranslated} `$  
 
 Since matrix multiplication is not commutative (AB != BA), we cannot multiply $x$ by $`M_t`$ first. This would break the law.  
 We observe that matrix a that's adjacent to vector will act on the vector first. However, when we write OpenGL code, we probably do something like this
@@ -157,7 +157,7 @@ while(1)
 }
 ```  
 Which is equivalent to 
-$`\small I \cdot M_t \cdot M_s \cdot x `$ - The order of effects is therefore reversed. 
+$`  I \cdot M_t \cdot M_s \cdot x `$ - The order of effects is therefore reversed. 
 
 
 ![Code Writes Rotate Then Scale](readme_images/rotateThenScale.png)   
