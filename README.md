@@ -39,7 +39,7 @@ These two polarised filters are rotated perpendicular to one another, completely
   
 Between them there is liquid crystal. Electric field applied by TFT (Thin Film Transistor) to this rotates lights, allowing them to pass through the second polarised filter.  
 If lights are rotated such that the second polarised filter has no effect, they are at full brightness. Colour is applied by a colour filter placed before the second polarised filter and after liquid crystal.  
-![Liquid Crystal Display](readme_images/lcd.png)  
+![Liquid-Crystal-Display](readme_images/lcd.png)  
   
 How light crystal is placed determines the type of LCD monitors. These can be `IPS (In Place Switching)`, `VA (Vertical Alignment)` or `TN (Twisted Nematic)`.  
 `IPS` monitors accurately produce colours and also have better viewing angle than `TN` monitors. As oppose to those, `TN` monitors have faster response time and refresh rate. `VA` monitors are the middle of the two (Take this with a grain of salt. My main monitor is VA and second IPS. I don't own a TN monitor).  
@@ -50,7 +50,7 @@ If your monitor is a LED monitor, chances are it's actually a LCD monitor with t
   
 As you might guess from how `LED` monitors actually work, `LED` monitors are actually a subset of LCD monitors hence they are `transmissive`. But, `OLED` monitors are `emissive` - They don't rely on back light. They produce lights by themselves.  
 
-![Organic Light Emitting Diode](readme_images/oled.png)  
+![Organic-Light-Emitting-Diode](readme_images/oled.png)  
 As the [picture](https://www.benq.com/en-us/knowledge-center/knowledge/oled-monitor.html#:~:text=Both%20have%20the%20same%20pixel,OLED%20has%20essentially%20infinite%20contrast.) above suggests, they don't need multiple layers unlike LCD monitors. Hence, OLED monitors are much thinner than them.  
 Colours and contrast are far more vivid and brightness is superior - Instead of relying on two polarisers, just completely shut them off.  
 However, OLED monitors are quite expensive since they are still relatively new.
@@ -160,10 +160,10 @@ Which is equivalent to
 $`  I \cdot M_t \cdot M_s \cdot x `$ - The order of effects is therefore reversed. 
 
 
-![Code Writes Rotate Then Scale](readme_images/rotateThenScale.png)   
+![Code-Writes-Rotate-Then-Scale](readme_images/rotateThenScale.png)   
 >Code rotates and then scales. Scale is applied first and then rotation.  
 
-![Code Writes Scale Then Rotate](readme_images/scaleThenRotate.png)  
+![Code-Writes-Scale-Then-Rotate](readme_images/scaleThenRotate.png)  
 >Code scales and then rotates. Rotation is applied first and then scale.
 
 # OpenGL
@@ -222,6 +222,8 @@ This results in any drawing calls visible on top of the new colour. If the order
 * [Element Buffer](#element-buffer)
 * [Vertex Array Buffer](#vertex-array-buffer)
 * [Uniform Buffer](#uniform-buffer)
+* [Depth Buffer](#depth-buffer)
+* [Stencil Buffer](#stencil-buffer)
 
 
 ---
@@ -310,9 +312,9 @@ This is particularly useful when sharing data that will remain the same for each
 
   };
   ```
-  It can only be accessed in the same file and does not need a prefix such as `UniformName.value1` to access.  
+  It does not need a prefix such as `UniformName.value1` to access.  
 
-  `std140` explicitly declares the padding rule for the instance. OpenGL simply allocates enough space to contain the variables but does not handle the spacing of each variable - it is up to the hardware to handle it.  
+  `std140` explicitly declares the padding rule for the block. OpenGL simply allocates enough space to contain the variables but does not handle the spacing of each variable - it is up to the hardware to handle it.  
 
   Explicit delcaration of padding rule makes it easier for programmers to work with uniform blocks.  
 
@@ -325,7 +327,7 @@ This is particularly useful when sharing data that will remain the same for each
     
 From this point, a uniform buffer can be associated with a block.  
 Association is carried out by assigning the same index value to both the buffer and the block.  
-![UniformBuffer Indexing](readme_images/UniformBufferIndexing.jpg)
+![Uniform-Buffer-Indexing](readme_images/UniformBufferIndexing.jpg)
 
 To assign an index to a buffer, call `glBindbufferBase` or `glBindBufferRange`.
 The definition of `glBindBufferRange` is  
@@ -398,13 +400,84 @@ glBindVertexArray(VAO);
 
 //Do the drawing calls here
 ```
+---
+## Depth Buffer
+Depth buffer is rather straightforward to understand. It is a buffer storing depth values which are 16, 24 or 32 bits floats.  These values are used to determine whether a fragment should be drawn or not.  
+
+By default OpenGL disables frame buffer and depth testing. Enable/disable it by
+`glEnable(GL_DEPTH_TEST)` or `glEnable(GL_DEPTH_TEST)`.
+  
+Depth value ranges between `[0, 1]`, the smaller the value the close it is to the screen (hence any fragments with their depth value larger than that won't be drawn).  
+
+By default calling `glClear` to clear the depth buffer resets the values to 1. This can be adjusted by calling `glClearDepth` which takes a double ranging between `[0, 1]`.  
+Current clear-depth value can be queried by calling `glGetFloatv` or `glGetDoublev` which expects an enum (`GL_DEPTH_CLEAR_VALUE`) and a pointer to the corresponding data type.  
+
+Should you want to do depth testing but do not want to write to the buffer, you can disable writing by `glDepthMask` with `GL_FALSE`. Any fragments drawn when writing is disabled will be treated as non-existent in the scene, allowing fragments behind them to be seen.
+
+![cube-is-drawn-behind-another](readme_images/cube_drawn_behind_another.jpg)
+
+```cpp
+// Draw some stuff here
+
+//Disable writing. Anything drawn after this
+//Is treated as non-existent.
+glDepthMask(GL_FALSE);
+// Draw a model here.
+// Note that complex models are likely to be drawn incorrectly.
+DrawModels();
+// Enable writing again. 
+glDepthMask(GL_TRUE);
+// Draw more stuff here
+DrawMoreModels();
+```
+
+You can also modify the testing condition by `glDepthFunc`. This is initially set to `GL_LESS`. It can be queried by `glGetIntegerv` with `GL_DEPTH_FUNC`.
+
+---
+## Stencil Buffer
+Stencil buffer stores an array of 8 bits masks which is used for stencil test.  
+Stencil test is also quite simple. Given a bit and a reference bit, apply bitwise AND and decide whether to discard or process. Each bit in stencil buffer is 0 by default.  
+
+Stencil test is not enabled by default. Enable it by `glEnable` with `GL_STENCIL_TEST`.
+
+By default testing is set to always succeed and writing to stencil is disabled. `glStencilFunc` sets the condition for stencil test.  
+```cpp
+void glStencilFunc(	GLenum func,
+ 	GLint ref,
+ 	GLuint mask);
+```
+Where
+* `func`: The condition for comparing the bits in stencil and `ref`
+* `ref`: Reference bit used for testing
+* `mask`: Bit mask which is ANDed with `ref` and the bits in `func`. The ANDed values are used for comparison.  
+
+`glStencilOp` determines the writing behaviour to the stencil buffer.
+```cpp
+void glStencilOp(	GLenum sfail,
+ 	GLenum dpfail,
+ 	GLenum dppass);
+```
+Where
+* `sfail`: What to do to the buffer when stencil testing fails.
+* `dpfail`: What to do to the buffer when stencil testing succeeds but depth testing fails.
+* `dppass`: What to do to the buffer when stencil and depth testing succeed.
+
+Initially all arguments are set to `GL_KEEP` which means the stencil buffer remains unchanged.
+
+Finally, `glStencilMask` sets the protection rules for writing to the buffer.
+By default the mask is `0xff`, enabling writing to all bits in the buffer. If 0 is present in a bit field, that bit in the buffer is write-protected.
+
+For example, if the stencil mask is `0x11000011`, only the two left-most and two right-most bits in the stencil buffer can be updated.  
+
+Stencil testing makes it possible to achieve cool visual effects such as rendering an object only through another object.
+![stencil-masked-rendering](readme_images/stencil_masked_rendering.png)
 
 ## Textures
 Textures have their own coordinate system where bottom left is `(0,0)` and top right is `(1,0)`. The horizontal axis is `S`, vertical `T` and depth (if 3D texture) `R`.  
-![Texture Coordinates](https://learnopengl.com/img/getting-started/tex_coords.png)
+![Texture-Coordinates](https://learnopengl.com/img/getting-started/tex_coords.png)
   
 It is possible to define coordinates larger/smaller than `(1,1)`. If larger than 1, the image will repeat. If smaller, only a subset of the texture will be used.    
-![UV mapping](readme_images/uvMap.png)
+![UV-mapping](readme_images/uvMap.png)
 
   
 The behaviour for when coordinates are greater than 1 can be set using `glTexParameteri` or `glTexParameterfv`.
@@ -422,7 +495,7 @@ glTexParameterfv(GL_TEXTURE_nD, GL_TEXTURE_BORDER_COLOR, borderColour);
 ```
 
 Similarly, you can choose filtering mode for when texture is zoomed in/out.
-![Texture Filtering](readme_images/texture_filtering.png)  
+![Texture-Filtering](readme_images/texture_filtering.png)  
 `GL_NEAREST` chooses the closest pixel whereas `GL_LINEAR` chooses the pixel average of neighbouring ones.
 ```cpp
 glTexParameteri(GL_TEXTURE_nD, GL_TEXTURE_MIN/MAG_FILTER, GL_FILERING_OPTION);

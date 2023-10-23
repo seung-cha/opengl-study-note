@@ -135,12 +135,4 @@
       <Filter>Source Files\Primitive</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="fragmentshader.glsl">
-      <Filter>Source Files\Helper</Filter>
-    </None>
-    <None Include="vertexshader.glsl">
-      <Filter>Source Files\Helper</Filter>
-    </None>
-  </ItemGroup>
 </Project>
