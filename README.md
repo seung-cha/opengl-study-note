@@ -3,7 +3,7 @@ Starter code for OpenGL (including the required libraries) and study note for pe
 This study note is not very extensive since I'm not a big fan of making neat notes - I prefer to understand and memorise them.  
 
 It is intended to read the [tutorial](https://learnopengl.com) over and over until I internalise it.  
-For UNSW students who happen to find this repo - this is **NOT** a study note for [`COMP3421`](https://www.handbook.unsw.edu.au/undergraduate/courses/2024/COMP3421?year=2024) - I didn't take that course and I don't intend to take it. I wish it taught OpenGL again, though.
+For UNSW students who happen to find this repo - this is **NOT** a study note for [`COMP3421`](https://www.handbook.unsw.edu.au/undergraduate/courses/2024/COMP3421?year=2024) - ~~I didn't take that course and I don't intend to take it.~~ (I TOOK THE COURSE!!!!!!!!!!!!!) I wish it taught OpenGL again, though.
 
 
 
@@ -21,7 +21,7 @@ Download [GLFW](#https://www.glfw.org) and [GLAD](https://glad.dav1d.de). For GL
 Watch this [youtube tutorial](https://youtu.be/XpBGwZNyUh0?si=rgaipn1xYPWQxw4p) for the rest of the step.  
 
 Other libraries are not included as they are not needed to run OpenGL. But you can download them here as well. [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h), [GLM](https://glm.g-truc.net/0.9.8/index.html).  
-A helper header is also included with can help with specific tasks.
+Helper classes are also included which can help with specific tasks. Some may require additional headers which are not included in this repository.
 
 # Theory
 Theory is important in programming (and is also the boring part of it). I solely believe you should not just take things as granted.  
@@ -221,6 +221,7 @@ This results in any drawing calls visible on top of the new colour. If the order
 * [Vertex Buffer](#vertex-buffer)
 * [Element Buffer](#element-buffer)
 * [Vertex Array Buffer](#vertex-array-buffer)
+* [Uniform Buffer](#uniform-buffer)
 
 
 ---
@@ -292,6 +293,80 @@ Linking between `VAO` and `VBO` occurs when calling
 It is possible to link multiple `VBO` with a single `VAO` - just call `glVertexAttribPointer` with a different index.  
 
 Linking between `VAO` and `EBO` occurs when `EBO` is bound by `glBindBuffer`. So a `VAO` must be bound prior to calling `glBindBuffer` for `EBO`.
+
+---
+## Uniform Buffer
+Uniform buffers make it possible to share data across multiple instances of shader program.  
+This is particularly useful when sharing data that will remain the same for each program (i.e matrices for transformation or light data)
+
+  Uniform data is declared as a bundle of values, much like a struct. It is called `uniform block`
+  ```glsl
+  layout (std140) uniform UniformName
+  {
+
+    vec3 value1
+    mat4 value2
+    ...
+
+  };
+  ```
+  It can only be accessed in the same file and does not need a prefix such as `UniformName.value1` to access.  
+
+  `std140` explicitly declares the padding rule for the instance. OpenGL simply allocates enough space to contain the variables but does not handle the spacing of each variable - it is up to the hardware to handle it.  
+
+  Explicit delcaration of padding rule makes it easier for programmers to work with uniform blocks.  
+
+  Uniform buffer is like an ordinary buffer so you need to generate and bind a buffer to `GL_UNIFORM_BUFFER`.
+  ```cpp
+  GLuint uniformbuffer;
+  glGenBuffers(1, &uniformBuffer);
+  glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer);
+  ```
+    
+From this point, a uniform buffer can be associated with a block.  
+Association is carried out by assigning the same index value to both the buffer and the block.  
+![UniformBuffer Indexing](readme_images/UniformBufferIndexing.jpg)
+
+To assign an index to a buffer, call `glBindbufferBase` or `glBindBufferRange`.
+The definition of `glBindBufferRange` is  
+```cpp
+void glBindBufferRange(	GLenum target,
+ 	GLuint index,
+ 	GLuint buffer,
+ 	GLintptr offset,
+ 	GLsizeiptr size);
+```  
+Where  
+* `target`: one of the enums such as `GL_ATOMIC_COUNTER_BUFFER`. It will be `GL_UNIFORM_BUFFER` in this case.
+* `index`: The binding index to be given to `buffer`. The same index will be given to uniform block.
+* `buffer`: The actual buffer to be associated. It also binds the buffer to `target`.
+* `offset`: Offset (padding) of the data
+* `size`: Size of the buffer
+
+`glBindBufferBase` is exactly the same except it will use the buffer size to allocate size.
+```cpp
+// Allocate space to the buffer but do not assign anything
+glBufferData(GL_UNIFORM_BUFFER, sizeof(data), 0, GL_STATIC_DRAW);
+// Assign uniformBuffer index of 0, allocate space equivalent to sizeof(data) and also bind it to GL_UNIFORM_BUFFER.
+glBufferBase(GL_UNIFORM_BUFFER, 0, uniformBuffer);
+```
+Then, by calling `glBufferData` or `glBufferSubData`, data can be passed to shader programs.
+
+In order for shader programs to receive values, uniform block needs to be assigned with an index as well.  
+This is carried out by `glUniformBlockBinding`.  
+```cpp
+void glUniformBlockBinding(	GLuint program,
+    GLuint uniformBlockIndex,
+    GLuint uniformBlockBinding);
+```
+Where
+* `program`: ID of the shader program
+* `uniformBlockIndex`: Uniform block location queried by `glGetUniformBlockIndex`
+* `uniformBlockBinding`: Index to assign
+
+`glGetUniformBlockIndex` is similar to `glGetUniformLocation`. It takes a programID and a string.  
+
+Note that uniform blocks are specific to the files they are defined in. This means a block defined in fragment shader is inaccessible in vertex shader.
 
 ---
 ## Shaders

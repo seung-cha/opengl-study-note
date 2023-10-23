@@ -7,9 +7,10 @@
 #include <sstream>
 #include <stdlib.h>
 
-namespace Helper {
+static class FileIncluder {
 
-	const char* ImportFile(const std::string path)
+public:
+	static const char* ImportFile(const std::string path)
 	{
 		std::ifstream stream;
 
@@ -23,7 +24,7 @@ namespace Helper {
 
 			std::string str = strStream.str();
 
-			return strdup(str.c_str());
+			return _strdup(str.c_str());
 
 
 
@@ -33,6 +34,6 @@ namespace Helper {
 			std::cout << "Could not open a file!" << std::endl;
 		}
 	}
-}
+};
 
 #endif
